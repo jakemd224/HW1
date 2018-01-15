@@ -82,11 +82,11 @@ Is this a song or a movie?<br>
         mediaType = request.form['media']
         parameter = {'term': mediaName, 'media': mediaType}
         response = requests.get('https://itunes.apple.com/search', params = parameter)
-        breakdown = str(response.text).split(':')
-        if '"resultCount"' in breakdown:
-            val = breakdown.index('"resultCount"')
-            return breakdown[val+1:]
-        return 'nay'
+        if str(response.text)[20] == '0' :
+            return "Your search turned up no results and is unlikely available on iTunes."
+        else :
+            temp = "Your search turned up some results and is likely available on iTunes!"
+            return temp
 
 if __name__ == '__main__':
     app.run()
