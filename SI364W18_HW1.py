@@ -5,13 +5,15 @@
 #################################
 
 ## List below here, in a comment/comments, the people you worked with on this assignment AND any resources you used to find code (50 point deduction for not doing so). If none, write "None".
-
+## Discussion challenge solutions
 
 
 ## [PROBLEM 1] - 150 points
 ## Below is code for one of the simplest possible Flask applications. Edit the code so that once you run this application locally and go to the URL 'http://localhost:5000/class', you see a page that says "Welcome to SI 364!"
 
-from flask import Flask
+from flask import Flask, request
+import requests
+import json
 app = Flask(__name__)
 app.debug = True
 
@@ -19,10 +21,75 @@ app.debug = True
 def hello_to_you():
     return 'Hello!'
 
+## Problem 1 code
+@app.route('/class')
+def welcome_to_class():
+    return 'Welcome to SI 364!'
+
+## Problem 2 code
+@app.route('/movie/<movieName>')
+def find_movie_info(movieName):
+    parameter = {'term': movieName, 'media': 'movie'}
+    response = requests.get('https://itunes.apple.com/search', params = parameter)
+    return response.text
+
+## Problem 3 code
+@app.route('/question', methods =['GET', 'POST'])
+def enter_data():
+    s= """<!DOCTYPE html>
+<html>
+<body>
+<form method="POST" action="http://localhost:5000/result">
+Enter your favorite number:<br>
+<input type="text" name="Favorite Number" value="">
+<br>
+<input type="submit" value="Submit">
+</form>
+</body>
+</html>"""
+    return s
+
+@app.route('/result', methods =['GET', 'POST'])
+def double_favorite_number():
+    if request.method == 'POST':
+        number = request.form['Favorite Number']
+        number = 2 * int(number)
+        response = 'Double your favorite number is '
+        response += str(number)
+        return response
+
+## Problem 4 code
+@app.route('/problem4form', methods =['GET', 'POST'])
+def problem4():
+    if request.method == 'GET' :
+        s= """<!DOCTYPE html>
+<html>
+<body>
+<form method="POST" action="http://localhost:5000/problem4form">
+Enter a song or movie you would like to know is on iTunes:<br>
+<input type="text" name="nameOfMedia" value="">
+<br>
+Is this a song or a movie?<br>
+<input type="radio" name="media" id="music" value="music"> song </input><br>
+<input type="radio" name="media" id="movie" value="movie"> movie </input><br>
+<input type="submit" value="Submit">
+</form>
+</body>
+</html>"""
+        return s
+    if request.method == 'POST' :
+        mediaName = request.form['nameOfMedia']
+        mediaType = request.form['media']
+        parameter = {'term': mediaName, 'media': mediaType}
+        response = requests.get('https://itunes.apple.com/search', params = parameter)
+        breakdown = str(response.text).split(':')
+        if '"resultCount"' in breakdown:
+            val = breakdown.index('"resultCount"')
+            return breakdown[val+1:]
+        return 'nay'
 
 if __name__ == '__main__':
     app.run()
-
 
 ## [PROBLEM 2] - 250 points
 ## Edit the code chunk above again so that if you go to the URL 'http://localhost:5000/movie/<name-of-movie-here-one-word>' you see a big dictionary of data on the page. For example, if you go to the URL 'http://localhost:5000/movie/ratatouille', you should see something like the data shown in the included file sample_ratatouille_data.txt, which contains data about the animated movie Ratatouille. However, if you go to the url http://localhost:5000/movie/titanic, you should get different data, and if you go to the url 'http://localhost:5000/movie/dsagdsgskfsl' for example, you should see data on the page that looks like this:
