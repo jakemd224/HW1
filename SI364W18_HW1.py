@@ -85,7 +85,13 @@ Is this a song or a movie?<br>
         if str(response.text)[20] == '0' :
             return "Your search turned up no results and is unlikely available on iTunes."
         else :
-            temp = "Your search turned up some results and is likely available on iTunes!"
+            temp = "Your search turned up "
+            temp += str(response.text)[20]
+            count = 0;
+            while (str(response.text)[21+count] != ','):
+                temp += str(response.text)[21+count]
+                count = count + 1
+            temp += " results and is likely available on iTunes!"
             return temp
 
 if __name__ == '__main__':
